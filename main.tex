@@ -1,0 +1,1057 @@
+ % ============================================================================
+% NUMERICAL METHODS WORKSHOP - MAIN DOCUMENT
+% Prepared for: Applied Numerical Analysis Course
+% Compilation: pdfLaTeX, XeLaTeX, or LuaLaTeX
+% Overleaf Compatible: Yes
+% ============================================================================
+
+\documentclass[12pt,a4paper]{article}
+
+% ============================================================================
+% ESSENTIAL PACKAGES
+% ============================================================================
+
+% Mathematics and Symbols
+\usepackage{amsmath}        % Advanced mathematical typesetting
+\usepackage{amssymb}        % Extended mathematical symbols
+\usepackage{amsthm}         % Theorem-like environments
+\usepackage{mathtools}      % Extension to amsmath
+\usepackage{bm}             % Bold mathematical symbols
+
+% Algorithms and Pseudocode
+\usepackage[ruled,vlined,linesnumbered]{algorithm2e}
+
+% Graphics and Visualization
+\usepackage{graphicx}       % Include external images
+\usepackage{tikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta, positioning, patterns, shapes.geometric}
+
+% Tables
+\usepackage{booktabs}       % Professional quality tables
+\usepackage{array}          % Extended column definitions
+\usepackage{multirow}       % Multi-row table cells
+
+% Document Formatting
+\usepackage[utf8]{inputenc}
+\usepackage[spanish,es-tabla]{babel} % Spanish language support
+\usepackage{geometry}
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=3cm
+}
+\usepackage{fancyhdr}       % Custom headers and footers
+\usepackage{enumitem}       % Customized lists
+\usepackage{xcolor}         % Color support
+
+% Hyperlinks and References
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
+    pdftitle={Taller Métodos Numéricos},
+    pdfauthor={Universidad Militar Nueva Granada}
+}
+
+% Code Listings (optional)
+\usepackage{listings}
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny\color{gray}
+}
+
+% ============================================================================
+% CUSTOM COMMANDS - MATHEMATICAL NOTATION
+% ============================================================================
+
+% Error notation
+\newcommand{\abs}[1]{\left|#1\right|}
+\newcommand{\norm}[1]{\left\|#1\right\|}
+\newcommand{\errf}[1]{\text{Error}_{#1}}
+\newcommand{\errrel}{\varepsilon_r}
+\newcommand{\errabs}{\varepsilon_a}
+
+% Numerical methods
+\newcommand{\iter}[1]{x^{(#1)}}
+\newcommand{\dif}{\mathrm{d}}
+\newcommand{\deriv}[2]{\frac{\dif #1}{\dif #2}}
+\newcommand{\pderiv}[2]{\frac{\partial #1}{\partial #2}}
+
+% Matrices and vectors
+\newcommand{\vect}[1]{\mathbf{#1}}
+\newcommand{\matr}[1]{\mathbf{#1}}
+
+% Common functions
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\ord}{O}
+
+% ============================================================================
+% THEOREM-LIKE ENVIRONMENTS
+% ============================================================================
+
+\theoremstyle{definition}
+\newtheorem{exercise}{Ejercicio}[section]
+\newtheorem{problem}{Problema}[section]
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{proposition}[theorem]{Proposición}
+\newtheorem{corollary}[theorem]{Corolario}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definición}[section]
+\newtheorem{example}{Ejemplo}[section]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Observación}
+\newtheorem*{note}{Nota}
+
+% Solution environment
+\newenvironment{solution}
+  {\begin{proof}[Solución]}
+  {\end{proof}}
+
+% ============================================================================
+% HEADER AND FOOTER CONFIGURATION
+% ============================================================================
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Métodos Numéricos}
+\rhead{Taller de Ejercicios}
+\cfoot{\thepage}
+
+% ============================================================================
+% TITLE PAGE INFORMATION
+% ============================================================================
+
+\title{
+    \vspace{-2cm}
+    \textbf{\Large Taller de Ecuaciones Diferenciales Parciales} \\
+    \vspace{0.5cm}
+    \large Métodos Numéricos - Ecuación de Calor, Onda y Laplace
+}
+
+\author{
+    \textbf{Autores:} \\[0.3cm]
+    Sebastian Andrés Rodríguez Carrillo \\
+    \small\texttt{est.sebastian.arod2@unimilitar.edu.co} \\[0.2cm]
+    José Luis López Ruiz \\
+    \small\texttt{est.jose.llopez@unimilitar.edu.co} \\[0.2cm]
+    Diego Alejandro Rodríguez Gómez \\
+    \small\texttt{est.diego.arodrigu1@unimilitar.edu.co} \\[0.2cm]
+    Daniel García Araque \\
+    \small\texttt{est.daniel.garciaa@unimilitar.edu.co} \\[0.5cm]
+    Universidad Militar Nueva Granada \\
+    Facultad de Ingeniería \\
+    Programa de Ingeniería Mecatrónica \\
+    \textit{Sexto Semestre}
+}
+
+\date{\today}
+
+% ============================================================================
+% DOCUMENT BEGIN
+% ============================================================================
+
+\begin{document}
+
+\maketitle
+\thispagestyle{fancy}
+
+\begin{abstract}
+Este documento presenta la solución completa de cuatro problemas de ecuaciones diferenciales parciales (EDPs) aplicados a fenómenos físicos. Se desarrollan en detalle: la ecuación de calor unidimensional con condiciones de frontera homogéneas, la ecuación de onda para una cuerda vibrante con desplazamiento inicial por tramos, y la ecuación de Laplace en dominios rectangulares. Cada ejercicio incluye el planteamiento del problema, la aplicación del método de separación de variables, el desarrollo de series de Fourier, y la visualización gráfica de las soluciones.
+\end{abstract}
+
+\newpage
+
+% ============================================================================
+% SECTION 1: HEAT EQUATION
+% ============================================================================
+
+\section{Ecuación de Calor Unidimensional}
+
+\subsection{Problema 1: Distribución de Temperatura en una Barra}
+
+\begin{exercise}[Ecuación de Calor con Condiciones Triangulares]
+Resolver la ecuación de calor:
+\begin{equation}
+    \frac{\partial u}{\partial t} = k \frac{\partial^2 u}{\partial x^2}
+\end{equation}
+
+con las siguientes condiciones de frontera y condición inicial:
+
+\textbf{Condiciones de frontera:}
+\begin{align}
+    u(0,t) &= 0, \quad t > 0 \\
+    u(100,t) &= 0, \quad t > 0
+\end{align}
+
+\textbf{Condición inicial:}
+\begin{equation}
+    u(x,0) = f(x) = \begin{cases}
+        0.8x & \text{si } 0 \leq x \leq 50 \\
+        0.8(100-x) & \text{si } 50 < x \leq 100
+    \end{cases}
+\end{equation}
+
+donde $k = 1.6352$ es el coeficiente de difusividad térmica.
+\end{exercise}
+
+\begin{solution}
+\textbf{Paso 1: Método de Separación de Variables}
+
+Proponemos una solución de la forma:
+\begin{equation}
+    u(x,t) = X(x)T(t)
+\end{equation}
+
+Sustituyendo en la ecuación de calor:
+\begin{equation}
+    X(x)T'(t) = k X''(x)T(t)
+\end{equation}
+
+Separando variables:
+\begin{equation}
+    \frac{T'(t)}{kT(t)} = \frac{X''(x)}{X(x)} = -\lambda
+\end{equation}
+
+donde $\lambda$ es la constante de separación.
+
+\textbf{Paso 2: Solución del Problema de Sturm-Liouville Espacial}
+
+De las condiciones de frontera $u(0,t) = u(100,t) = 0$, obtenemos:
+\begin{equation}
+    X''(x) + \lambda X(x) = 0, \quad X(0) = 0, \quad X(100) = 0
+\end{equation}
+
+Los autovalores y autofunciones son:
+\begin{align}
+    \lambda_n &= \left(\frac{n\pi}{100}\right)^2, \quad n = 1, 2, 3, \ldots \\
+    X_n(x) &= \sin\left(\frac{n\pi x}{100}\right)
+\end{align}
+
+\textbf{Paso 3: Solución de la Ecuación Temporal}
+
+Para cada $\lambda_n$:
+\begin{equation}
+    T'(t) + k\lambda_n T(t) = 0 \implies T_n(t) = C_n e^{-k\lambda_n t}
+\end{equation}
+
+Sustituyendo $k = 1.6352$ y $\lambda_n$:
+\begin{equation}
+    T_n(t) = C_n \exp\left(-1.6352 \left(\frac{n\pi}{100}\right)^2 t\right)
+\end{equation}
+
+\textbf{Paso 4: Solución General por Superposición}
+
+\begin{equation}
+    u(x,t) = \sum_{n=1}^{\infty} B_n \sin\left(\frac{n\pi x}{100}\right) \exp\left(-1.6352 \left(\frac{n\pi}{100}\right)^2 t\right)
+\end{equation}
+
+\textbf{Paso 5: Cálculo de los Coeficientes de Fourier}
+
+De la condición inicial $u(x,0) = f(x)$:
+\begin{equation}
+    B_n = \frac{2}{100} \int_0^{100} f(x) \sin\left(\frac{n\pi x}{100}\right) dx
+\end{equation}
+
+Para la función por tramos:
+\begin{align}
+    B_n &= \frac{2}{100} \left[\int_0^{50} 0.8x \sin\left(\frac{n\pi x}{100}\right) dx + \int_{50}^{100} 0.8(100-x) \sin\left(\frac{n\pi x}{100}\right) dx\right]
+\end{align}
+
+Usando integración por partes:
+\begin{align}
+    \int x \sin(ax) dx &= -\frac{x}{a}\cos(ax) + \frac{1}{a^2}\sin(ax)
+\end{align}
+
+Después de realizar los cálculos:
+\begin{equation}
+    B_n = \begin{cases}
+        \displaystyle \frac{320}{n^2 \pi^2} \sin\left(\frac{n\pi}{2}\right) & n \text{ impar} \\[0.3cm]
+        0 & n \text{ par}
+    \end{cases}
+\end{equation}
+
+Para $n$ impar:
+\begin{equation}
+    B_n = \frac{320}{n^2 \pi^2} \cdot (-1)^{(n-1)/2}
+\end{equation}
+
+\textbf{Primeros valores:}
+\begin{align}
+    B_1 &= \frac{320}{\pi^2} \approx 32.429 \\
+    B_3 &= -\frac{320}{9\pi^2} \approx -3.603 \\
+    B_5 &= \frac{320}{25\pi^2} \approx 1.297 \\
+    B_7 &= -\frac{320}{49\pi^2} \approx -0.663 \\
+    B_9 &= \frac{320}{81\pi^2} \approx 0.400
+\end{align}
+
+\textbf{Solución Completa (Inciso a):}
+
+\begin{equation}
+    \boxed{u(x,t) = \sum_{n=1,3,5,\ldots}^{\infty} \frac{320}{n^2\pi^2}(-1)^{(n-1)/2} \sin\left(\frac{n\pi x}{100}\right) \exp\left(-\frac{1.6352n^2\pi^2 t}{10000}\right)}
+\end{equation}
+
+\end{solution}
+
+\subsection{Inciso b: Suma Parcial y Visualización}
+
+\begin{exercise}[Gráfica 3D de la Solución]
+Graficar la suma parcial $S_5(x,t)$ usando los primeros cinco términos no nulos (n=1,3,5,7,9) para $0 \leq x \leq 100$ y $0 \leq t \leq 200$.
+\end{exercise}
+
+\begin{solution}
+\textbf{Suma Parcial $S_5(x,t)$:}
+
+\begin{align}
+    S_5(x,t) = &\frac{320}{\pi^2} \sin\left(\frac{\pi x}{100}\right) \exp\left(-\frac{1.6352\pi^2 t}{10000}\right) \\
+    &- \frac{320}{9\pi^2} \sin\left(\frac{3\pi x}{100}\right) \exp\left(-\frac{14.7168\pi^2 t}{10000}\right) \\
+    &+ \frac{320}{25\pi^2} \sin\left(\frac{5\pi x}{100}\right) \exp\left(-\frac{40.88\pi^2 t}{10000}\right) \\
+    &- \frac{320}{49\pi^2} \sin\left(\frac{7\pi x}{100}\right) \exp\left(-\frac{80.2272\pi^2 t}{10000}\right) \\
+    &+ \frac{320}{81\pi^2} \sin\left(\frac{9\pi x}{100}\right) \exp\left(-\frac{132.5952\pi^2 t}{10000}\right)
+\end{align}
+
+\textbf{Comportamiento de la Solución:}
+
+\begin{itemize}
+    \item En $t=0$: $S_5(x,0)$ aproxima la distribución triangular inicial
+    \item Para $t$ pequeño: Se observa la forma triangular que se suaviza
+    \item Para $t$ grande: La temperatura tiende a cero exponencialmente en toda la barra
+    \item El término dominante es $n=1$ (menor decaimiento exponencial)
+\end{itemize}
+
+\textbf{Código para graficar en Mathematica:}
+
+\begin{lstlisting}[language=Mathematica]
+S5[x_, t_] := Sum[
+  (320/(n^2*Pi^2))*(-1)^((n-1)/2)*
+  Sin[n*Pi*x/100]*
+  Exp[-1.6352*(n*Pi/100)^2*t],
+  {n, 1, 9, 2}
+]
+
+Plot3D[S5[x, t], {x, 0, 100}, {t, 0, 200},
+  PlotRange -> All,
+  AxesLabel -> {"x", "t", "u(x,t)"},
+  PlotLabel -> "Ecuación de Calor - Suma Parcial S5",
+  ViewPoint -> {-2, -2, 1},
+  ColorFunction -> "Temperature"]
+\end{lstlisting}
+
+\textbf{Análisis Físico:}
+
+\begin{table}[h]
+\centering
+\caption{Valores de $u(x,t)$ en puntos clave}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{$x$} & \textbf{$t=0$} & \textbf{$t=50$} & \textbf{$t=200$} \\ 
+\midrule
+0   & 0      & 0       & 0 \\
+25  & 20     & 8.5     & 0.02 \\
+50  & 40     & 17.0    & 0.04 \\
+75  & 20     & 8.5     & 0.02 \\
+100 & 0      & 0       & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Visualización Gráfica:}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{ejercicio1_condicion_inicial.png}
+\caption{Condición inicial: Distribución triangular de temperatura y su aproximación mediante serie de Fourier con 5 términos.}
+\label{fig:calor_inicial}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{ejercicio1_evolucion_temporal.png}
+\caption{Evolución temporal de la temperatura en la barra para diferentes valores de tiempo.}
+\label{fig:calor_evolucion}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{ejercicio1_superficie_3d.png}
+\caption{Superficie 3D de la solución $u(x,t)$ de la ecuación de calor.}
+\label{fig:calor_3d}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{ejercicio1_contorno.png}
+\caption{Mapa de contorno de la temperatura $u(x,t)$ mostrando la difusión del calor en el tiempo.}
+\label{fig:calor_contorno}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{ejercicio1_convergencia.png}
+\caption{Convergencia de la serie de Fourier en el punto medio de la barra ($x=50$).}
+\label{fig:calor_convergencia}
+\end{figure}
+
+\end{solution}
+
+\newpage
+
+% ============================================================================
+% SECTION 2: WAVE EQUATION
+% ============================================================================
+
+\section{Ecuación de Onda - Cuerda Vibrante}
+
+\subsection{Problema 2: Cuerda con Desplazamiento Inicial por Tramos}
+
+\begin{exercise}[Vibración de Cuerda con Perfil Zigzag]
+Una cuerda está fija en $x=0$ y $x=L$. El desplazamiento inicial es:
+\begin{equation}
+    f(x) = \begin{cases}
+        \displaystyle \frac{3h}{L}x & 0 \leq x \leq \frac{L}{3} \\[0.3cm]
+        \displaystyle h - \frac{6h}{L}\left(x - \frac{L}{3}\right) & \frac{L}{3} \leq x \leq \frac{2L}{3} \\[0.3cm]
+        \displaystyle -h + \frac{3h}{L}\left(x - \frac{2L}{3}\right) & \frac{2L}{3} \leq x \leq L
+    \end{cases}
+\end{equation}
+
+La cuerda se suelta desde el reposo: $\displaystyle \frac{\partial u}{\partial t}(x,0) = 0$
+
+Condiciones de frontera: $u(0,t) = u(L,t) = 0$
+
+Resolver la ecuación de onda:
+\begin{equation}
+    \frac{\partial^2 u}{\partial t^2} = c^2 \frac{\partial^2 u}{\partial x^2}
+\end{equation}
+\end{exercise}
+
+\begin{solution}
+\textbf{Paso 1: Solución General de la Ecuación de Onda}
+
+Por separación de variables, la solución general es:
+\begin{equation}
+    u(x,t) = \sum_{n=1}^{\infty} \left[A_n \cos\left(\frac{n\pi c t}{L}\right) + B_n \sin\left(\frac{n\pi c t}{L}\right)\right] \sin\left(\frac{n\pi x}{L}\right)
+\end{equation}
+
+\textbf{Paso 2: Aplicación de Condición de Reposo Inicial}
+
+De $u_t(x,0) = 0$:
+\begin{equation}
+    \left.\frac{\partial u}{\partial t}\right|_{t=0} = \sum_{n=1}^{\infty} \frac{n\pi c}{L} B_n \sin\left(\frac{n\pi x}{L}\right) = 0
+\end{equation}
+
+Por lo tanto: $B_n = 0$ para todo $n$.
+
+\textbf{Solución simplificada:}
+\begin{equation}
+    u(x,t) = \sum_{n=1}^{\infty} A_n \cos\left(\frac{n\pi c t}{L}\right) \sin\left(\frac{n\pi x}{L}\right)
+\end{equation}
+
+\textbf{Paso 3: Cálculo de los Coeficientes $A_n$}
+
+De $u(x,0) = f(x)$:
+\begin{equation}
+    A_n = \frac{2}{L} \int_0^L f(x) \sin\left(\frac{n\pi x}{L}\right) dx
+\end{equation}
+
+Dividiendo en tres integrales:
+\begin{align}
+    A_n = &\frac{2}{L} \int_0^{L/3} \frac{3h}{L}x \sin\left(\frac{n\pi x}{L}\right) dx \\
+    &+ \frac{2}{L} \int_{L/3}^{2L/3} \left[h - \frac{6h}{L}\left(x - \frac{L}{3}\right)\right] \sin\left(\frac{n\pi x}{L}\right) dx \\
+    &+ \frac{2}{L} \int_{2L/3}^L \left[-h + \frac{3h}{L}\left(x - \frac{2L}{3}\right)\right] \sin\left(\frac{n\pi x}{L}\right) dx
+\end{align}
+
+\textbf{Paso 4: Evaluación de las Integrales}
+
+Usando integración por partes y simplificando:
+
+\begin{align}
+    A_n = \frac{18h}{n^2\pi^2} \left[\sin\left(\frac{n\pi}{3}\right) - \sin\left(\frac{2n\pi}{3}\right)\right]
+\end{align}
+
+Simplificando con identidades trigonométricas:
+\begin{equation}
+    A_n = \frac{18h}{n^2\pi^2} \left[2\cos\left(\frac{n\pi}{2}\right)\sin\left(\frac{n\pi}{6}\right)\right]
+\end{equation}
+
+Para diferentes valores de $n$:
+\begin{align}
+    n = 1&: \quad A_1 = \frac{18h}{\pi^2} \cdot 0 = 0 \\
+    n = 2&: \quad A_2 = \frac{18h}{4\pi^2}(\sin(60°) - \sin(120°)) = 0 \\
+    n = 3&: \quad A_3 = \frac{18h}{9\pi^2}(0 - 0) = 0 \\
+    n = 6&: \quad A_6 = \frac{18h}{36\pi^2}(\sin(120°) - \sin(240°)) = \frac{18h\sqrt{3}}{18\pi^2} \\
+    &\vdots
+\end{align}
+
+\textbf{Patrón general:}
+\begin{equation}
+    A_n = \begin{cases}
+        \displaystyle \frac{18h}{n^2\pi^2}\left[\sin\left(\frac{n\pi}{3}\right) - \sin\left(\frac{2n\pi}{3}\right)\right] & \text{términos no nulos} \\
+        0 & \text{cuando } n \equiv 0 \pmod{3}
+    \end{cases}
+\end{equation}
+
+\textbf{Solución Final:}
+
+\begin{equation}
+    \boxed{u(x,t) = \sum_{n=1}^{\infty} A_n \cos\left(\frac{n\pi c t}{L}\right) \sin\left(\frac{n\pi x}{L}\right)}
+\end{equation}
+
+donde $A_n$ está dado arriba.
+
+\textbf{Interpretación Física:}
+
+\begin{itemize}
+    \item La solución es puramente oscilatoria (no hay amortiguamiento)
+    \item Cada modo vibra con frecuencia $\omega_n = \frac{n\pi c}{L}$
+    \item El perfil inicial zigzag se descompone en modos normales de vibración
+    \item Los modos con $n$ múltiplo de 3 tienen amplitud cero debido a la simetría del perfil
+\end{itemize}
+
+\textbf{Visualización Gráfica:}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{ejercicio2_perfil_inicial.png}
+\caption{Perfil inicial de desplazamiento de la cuerda con forma de zigzag.}
+\label{fig:onda_inicial}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{ejercicio2_snapshots.png}
+\caption{Snapshots del desplazamiento de la cuerda en diferentes instantes de tiempo dentro de un período.}
+\label{fig:onda_snapshots}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{ejercicio2_superficie_3d.png}
+\caption{Superficie 3D mostrando la evolución espacio-temporal de la cuerda vibrante.}
+\label{fig:onda_3d}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{ejercicio2_espectro.png}
+\caption{Espectro modal: amplitudes de los primeros 20 modos de vibración.}
+\label{fig:onda_espectro}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{ejercicio2_energia.png}
+\caption{Conservación de energía en la cuerda vibrante a lo largo del tiempo.}
+\label{fig:onda_energia}
+\end{figure}
+
+\end{solution}
+
+\newpage
+
+% ============================================================================
+% SECTION 3: LAPLACE EQUATION
+% ============================================================================
+
+\section{Ecuación de Laplace en Placa Rectangular}
+
+\subsection{Problema 3: Placa con Temperatura Prescrita en el Borde Superior}
+
+\begin{exercise}[Ecuación de Laplace con Condición General]
+Resolver la ecuación de Laplace:
+\begin{equation}
+    \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} = 0
+\end{equation}
+
+en la placa rectangular $0 \leq x \leq a$, $0 \leq y \leq b$ con condiciones:
+\begin{align}
+    u(0,y) &= 0, \quad 0 < y < b \\
+    u(a,y) &= 0, \quad 0 < y < b \\
+    u(x,0) &= 0, \quad 0 < x < a \\
+    u(x,b) &= f(x), \quad 0 < x < a
+\end{align}
+\end{exercise}
+
+Por lo tanto, $\boxed{f(1.5) \approx 4.375}$
+
+\textbf{Visualización:}
+
+\begin{center}
+\begin{tikzpicture}
+    \begin{axis}[
+        width=12cm,
+        height=8cm,
+        xlabel={$x$},
+        ylabel={$f(x)$},
+        grid=major,
+        legend pos=north west,
+        domain=0:3,
+        samples=100
+    ]
+    
+    % Polinomio interpolador
+    \addplot[blue, thick] {1/3*x^3 - 5/3*x^2 + 4*x + 1};
+    
+    % Puntos de datos
+    \addplot[only marks, mark=*, red, mark size=3pt] 
+        coordinates {(0,1) (1,3) (2,2) (3,5)};
+    
+    % Punto estimado
+    \addplot[only marks, mark=square*, green!60!black, mark size=4pt] 
+        coordinates {(1.5,4.375)};
+    
+    \legend{$P_3(x)$, Datos, $P_3(1.5)$}
+    \end{axis}
+\end{tikzpicture}
+\end{center}
+
+\end{solution}
+
+% ============================================================================
+% SECTION 3: NUMERICAL INTEGRATION
+% ============================================================================
+% SECTION 3: LAPLACE EQUATION - GENERAL CASE  
+% ============================================================================
+
+\section{Ecuación de Laplace en Placa Rectangular}
+
+\subsection{Problema 3: Distribución de Temperatura en Placa (Caso General)}
+
+\begin{exercise}[Ecuación de Laplace con Condición General]
+Resolver la ecuación de Laplace bidimensional en una placa rectangular:
+\begin{equation}
+    \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} = 0
+\end{equation}
+
+con las siguientes condiciones de frontera:
+\begin{align}
+    u(0, y) &= 0, \quad 0 < y < b \\
+    u(a, y) &= 0, \quad 0 < y < b \\
+    u(x, 0) &= 0, \quad 0 < x < a \\
+    u(x, b) &= f(x), \quad 0 < x < a
+\end{align}
+
+donde $f(x)$ es una función dada en el borde superior de la placa.
+\end{exercise}
+
+\begin{solution}
+\textbf{Paso 1: Separación de Variables}
+
+Asumimos una solución de la forma $u(x,y) = X(x)Y(y)$. Sustituyendo en la ecuación de Laplace:
+\begin{equation}
+    X''(x)Y(y) + X(x)Y''(y) = 0
+\end{equation}
+
+Dividiendo por $X(x)Y(y)$:
+\begin{equation}
+    \frac{X''(x)}{X(x)} + \frac{Y''(y)}{Y(y)} = 0
+\end{equation}
+
+Como cada término depende de una variable independiente, ambos deben ser constantes:
+\begin{align}
+    \frac{X''(x)}{X(x)} &= -\lambda \\
+    \frac{Y''(y)}{Y(y)} &= \lambda
+\end{align}
+
+\textbf{Paso 2: Problema de Sturm-Liouville para $X(x)$}
+
+De las condiciones de frontera homogéneas $u(0,y) = 0$ y $u(a,y) = 0$:
+\begin{equation}
+    X(0) = 0, \quad X(a) = 0
+\end{equation}
+
+El problema de eigenvalores es:
+\begin{equation}
+    X''(x) + \lambda X(x) = 0, \quad X(0) = 0, \quad X(a) = 0
+\end{equation}
+
+Los eigenvalores y eigenfunciones son:
+\begin{equation}
+    \lambda_n = \left(\frac{n\pi}{a}\right)^2, \quad X_n(x) = \sin\left(\frac{n\pi x}{a}\right), \quad n = 1, 2, 3, \ldots
+\end{equation}
+
+\textbf{Paso 3: Solución de la ecuación para $Y(y)$}
+
+Para cada $\lambda_n$, la ecuación para $Y(y)$ es:
+\begin{equation}
+    Y''(y) - \left(\frac{n\pi}{a}\right)^2 Y(y) = 0
+\end{equation}
+
+La solución general es:
+\begin{equation}
+    Y_n(y) = A_n \sinh\left(\frac{n\pi y}{a}\right) + B_n \cosh\left(\frac{n\pi y}{a}\right)
+\end{equation}
+
+De la condición $u(x,0) = 0$, obtenemos $B_n = 0$. Por lo tanto:
+\begin{equation}
+    Y_n(y) = A_n \sinh\left(\frac{n\pi y}{a}\right)
+\end{equation}
+
+\textbf{Paso 4: Serie de Fourier General}
+
+La solución general es:
+\begin{equation}
+    u(x,y) = \sum_{n=1}^{\infty} B_n \sinh\left(\frac{n\pi y}{a}\right) \sin\left(\frac{n\pi x}{a}\right)
+\end{equation}
+
+\textbf{Paso 5: Determinación de los coeficientes $B_n$}
+
+De la condición $u(x,b) = f(x)$:
+\begin{equation}
+    f(x) = \sum_{n=1}^{\infty} B_n \sinh\left(\frac{n\pi b}{a}\right) \sin\left(\frac{n\pi x}{a}\right)
+\end{equation}
+
+Multiplicando por $\sin(m\pi x/a)$ e integrando:
+\begin{equation}
+    \int_0^a f(x) \sin\left(\frac{m\pi x}{a}\right) dx = B_m \sinh\left(\frac{m\pi b}{a}\right) \cdot \frac{a}{2}
+\end{equation}
+
+Por lo tanto:
+\begin{equation}
+    B_n = \frac{2}{a \sinh(n\pi b/a)} \int_0^a f(x) \sin\left(\frac{n\pi x}{a}\right) dx
+\end{equation}
+
+\textbf{Solución Final:}
+\begin{equation}
+    \boxed{u(x,y) = \sum_{n=1}^{\infty} B_n \sinh\left(\frac{n\pi y}{a}\right) \sin\left(\frac{n\pi x}{a}\right)}
+\end{equation}
+
+donde:
+\begin{equation}
+    \boxed{B_n = \frac{2}{a \sinh(n\pi b/a)} \int_0^a f(x) \sin\left(\frac{n\pi x}{a}\right) dx}
+\end{equation}
+
+\textbf{Interpretación Física:}
+
+La solución representa la distribución de temperatura en estado estacionario en una placa rectangular donde:
+\begin{itemize}
+    \item Los bordes en $x = 0$ y $x = a$ se mantienen a temperatura cero
+    \item El borde en $y = 0$ se mantiene a temperatura cero
+    \item El borde en $y = b$ tiene distribución de temperatura $f(x)$
+    \item La función $\sinh(n\pi y/a)$ describe cómo la temperatura varía desde $y=0$ hasta $y=b$
+    \item Los términos de orden superior ($n$ grande) decaen más rápidamente con la distancia
+\end{itemize}
+
+\textbf{Visualización Gráfica:}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{ejercicio3_superficie_3d.png}
+\caption{Distribución de temperatura en estado estacionario para el Ejercicio 3 (condición no homogénea en $y=b$).}
+\label{fig:laplace3_3d}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{ejercicio3_contorno.png}
+\caption{Isotermas (líneas de temperatura constante) en la placa rectangular.}
+\label{fig:laplace3_contorno}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{ejercicio3_perfiles.png}
+\caption{Perfiles de temperatura a diferentes alturas de la placa.}
+\label{fig:laplace3_perfiles}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{ejercicio3_gradiente.png}
+\caption{Campo vectorial del gradiente de temperatura $\nabla u(x,y)$.}
+\label{fig:laplace3_gradiente}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.75\textwidth]{ejercicio3_convergencia.png}
+\caption{Convergencia de la serie de Fourier en el centro de la placa.}
+\label{fig:laplace3_convergencia}
+\end{figure}
+
+\end{solution}
+
+% ============================================================================
+% SECTION 4: LAPLACE EQUATION - SPECIFIC CASE
+% ============================================================================
+
+\section{Ecuación de Laplace con Parámetros Específicos}
+
+\begin{exercise}[Ecuación de Laplace - Caso con Condiciones Dadas]
+Resolver la ecuación de Laplace bidimensional en una placa rectangular:
+\begin{equation*}
+    \frac{\partial^2 u}{\partial x^2} + \frac{\partial^2 u}{\partial y^2} = 0
+\end{equation*}
+
+con las siguientes condiciones de frontera:
+\begin{align*}
+    u(0, y) &= 0, \quad 0 < y < b \\
+    u(a, y) &= 0, \quad 0 < y < b \\
+    u(x, 0) &= f(x), \quad 0 < x < a \\
+    u(x, b) &= 0, \quad 0 < x < a
+\end{align*}
+
+Donde $f(x)$ es una función dada. Encuentre la solución general y calcule los primeros coeficientes de Fourier.
+\end{exercise}
+
+\begin{solution}
+\textbf{Paso 1: Separación de Variables}
+
+Asumimos $u(x,y) = X(x)Y(y)$ y procedemos como en el ejercicio anterior. Esta vez las condiciones homogéneas están en $x = 0$, $x = a$ y $y = b$:
+\begin{equation}
+    X(0) = 0, \quad X(a) = 0, \quad Y(b) = 0
+\end{equation}
+
+\textbf{Paso 2: Problema de Sturm-Liouville}
+
+Igual que antes:
+\begin{equation}
+    X_n(x) = \sin\left(\frac{n\pi x}{a}\right), \quad \lambda_n = \left(\frac{n\pi}{a}\right)^2
+\end{equation}
+
+\textbf{Paso 3: Solución para $Y(y)$ con condición en $y = b$}
+
+La ecuación para $Y(y)$ es:
+\begin{equation}
+    Y''(y) - \left(\frac{n\pi}{a}\right)^2 Y(y) = 0
+\end{equation}
+
+con $Y(b) = 0$. La solución que satisface $Y(b) = 0$ es:
+\begin{equation}
+    Y_n(y) = A_n \sinh\left(\frac{n\pi(b-y)}{a}\right)
+\end{equation}
+
+(Nota: Usamos $\sinh(n\pi(b-y)/a)$ que se anula en $y = b$)
+
+\textbf{Paso 4: Serie de Fourier}
+
+La solución general es:
+\begin{equation}
+    u(x,y) = \sum_{n=1}^{\infty} B_n \sinh\left(\frac{n\pi(b-y)}{a}\right) \sin\left(\frac{n\pi x}{a}\right)
+\end{equation}
+
+\textbf{Paso 5: Coeficientes de Fourier}
+
+De la condición $u(x,0) = f(x)$:
+\begin{equation}
+    f(x) = \sum_{n=1}^{\infty} B_n \sinh\left(\frac{n\pi b}{a}\right) \sin\left(\frac{n\pi x}{a}\right)
+\end{equation}
+
+Los coeficientes son:
+\begin{equation}
+    B_n = \frac{2}{a \sinh(n\pi b/a)} \int_0^a f(x) \sin\left(\frac{n\pi x}{a}\right) dx
+\end{equation}
+
+\textbf{Solución Final:}
+\begin{equation}
+    \boxed{u(x,y) = \sum_{n=1}^{\infty} B_n \sinh\left(\frac{n\pi(b-y)}{a}\right) \sin\left(\frac{n\pi x}{a}\right)}
+\end{equation}
+
+donde:
+\begin{equation}
+    \boxed{B_n = \frac{2}{a \sinh(n\pi b/a)} \int_0^a f(x) \sin\left(\frac{n\pi x}{a}\right) dx}
+\end{equation}
+
+\textbf{Diferencia con el Ejercicio 3:}
+
+La diferencia clave es que ahora la condición no homogénea está en $y = 0$ (en lugar de $y = b$), por lo que la función hiperbólica es $\sinh(n\pi(b-y)/a)$ que decrece desde $y = 0$ hasta anularse en $y = b$, en lugar de crecer desde $y = 0$ hasta alcanzar su máximo en $y = b$.
+
+\textbf{Visualización Gráfica:}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.9\textwidth]{ejercicio4_superficie_3d.png}
+\caption{Distribución de temperatura en estado estacionario para el Ejercicio 4 (condición no homogénea en $y=0$).}
+\label{fig:laplace4_3d}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.85\textwidth]{ejercicio4_contorno.png}
+\caption{Isotermas para el caso con condición no homogénea en el borde inferior.}
+\label{fig:laplace4_contorno}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{ejercicios3y4_comparacion.png}
+\caption{Comparación directa entre los dos casos de la ecuación de Laplace: condición en $y=b$ (izquierda) vs condición en $y=0$ (derecha).}
+\label{fig:laplace_comparacion}
+\end{figure}
+
+\end{solution}
+
+% ============================================================================
+% CONCLUSIONS AND REFERENCES
+% ============================================================================
+
+\section{Conclusiones}
+
+En este taller se han resuelto cuatro problemas fundamentales de ecuaciones diferenciales parciales:
+\begin{equation}
+    I \approx \frac{h}{2}\left[f(x_0) + 2\sum_{i=1}^{n-1}f(x_i) + f(x_n)\right]
+\end{equation}
+
+donde $h = \frac{b-a}{n}$ y $x_i = a + ih$.
+
+\textbf{Paso 2: Cálculo con $n = 4$ subintervalos}
+
+Parámetros:
+\begin{align}
+    a &= 0, \quad b = 2, \quad n = 4 \\
+    h &= \frac{2-0}{4} = 0.5 \\
+    x_i &= 0, \, 0.5, \, 1.0, \, 1.5, \, 2.0
+\end{align}
+
+Evaluación de la función $f(x) = e^{x^2}$:
+
+\begin{table}[h]
+\centering
+\caption{Evaluaciones para Regla del Trapecio ($n=4$)}
+\begin{tabular}{@{}ccccc@{}}
+\toprule
+\textbf{$i$} & \textbf{$x_i$} & \textbf{$x_i^2$} & \textbf{$f(x_i) = e^{x_i^2}$} & \textbf{Coeficiente} \\ 
+\midrule
+0 & 0.0 & 0.00 & 1.0000 & 1 \\
+1 & 0.5 & 0.25 & 1.2840 & 2 \\
+2 & 1.0 & 1.00 & 2.7183 & 2 \\
+3 & 1.5 & 2.25 & 9.4877 & 2 \\
+4 & 2.0 & 4.00 & 54.5982 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Aplicando la fórmula:
+\begin{align}
+    I_4 &= \frac{0.5}{2}\left[1.0000 + 2(1.2840 + 2.7183 + 9.4877) + 54.5982\right] \\
+        &= 0.25\left[1.0000 + 2(13.4900) + 54.5982\right] \\
+        &= 0.25\left[1.0000 + 26.9800 + 54.5982\right] \\
+        &= 0.25 \times 82.5782 \\
+        &= 20.6446
+\end{align}
+
+\textbf{Paso 3: Cálculo con $n = 8$ subintervalos}
+
+Parámetros:
+\begin{equation}
+    h = \frac{2-0}{8} = 0.25, \quad x_i = 0, \, 0.25, \, 0.5, \, \ldots, \, 2.0
+\end{equation}
+
+\begin{table}[h]
+\centering
+\caption{Evaluaciones para Regla del Trapecio ($n=8$)}
+\small
+\begin{tabular}{@{}cccc@{}}
+\toprule
+\textbf{$i$} & \textbf{$x_i$} & \textbf{$f(x_i)$} & \textbf{Coef.} \\ 
+\midrule
+0 & 0.00 & 1.0000 & 1 \\
+1 & 0.25 & 1.0645 & 2 \\
+2 & 0.50 & 1.2840 & 2 \\
+3 & 0.75 & 1.7551 & 2 \\
+4 & 1.00 & 2.7183 & 2 \\
+5 & 1.25 & 4.9182 & 2 \\
+6 & 1.50 & 9.4877 & 2 \\
+7 & 1.75 & 19.6325 & 2 \\
+8 & 2.00 & 54.5982 & 1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{align}
+    I_8 &= \frac{0.25}{2}\left[1.0000 + 2(1.0645 + 1.2840 + \cdots + 19.6325) + 54.5982\right] \\
+        &= 0.125\left[1.0000 + 2(40.8603) + 54.5982\right] \\
+        &= 0.125 \times 137.3188 \\
+        &= 17.1649
+\end{align}
+
+\textbf{Paso 4: Análisis de Error}
+
+El error teórico de la regla del trapecio compuesta es:
+\begin{equation}
+    E_T = -\frac{(b-a)h^2}{12}f''(\xi), \quad \xi \in [a,b]
+\end{equation}
+
+El error es proporcional a $h^2$, por lo que:
+\begin{equation}
+    \frac{E_{n=4}}{E_{n=8}} \approx \frac{h_4^2}{h_8^2} = \frac{(0.5)^2}{(0.25)^2} = 4
+\end{equation}
+
+Diferencia entre aproximaciones:
+\begin{equation}
+\textbf{1. Ecuación de Calor:} Se resolvió la ecuación de difusión del calor unidimensional mediante separación de variables y series de Fourier. Los resultados muestran cómo una distribución inicial triangular de temperatura evoluciona en el tiempo hacia el equilibrio térmico. El cálculo explícito de los coeficientes de Fourier permitió construir aproximaciones finitas de la solución.
+
+\textbf{2. Ecuación de Onda:} Se modeló la vibración de una cuerda con condiciones iniciales no suaves (distribución en zigzag). La solución de D'Alembert generalizada mediante series de Fourier reveló la estructura modal de las vibraciones y permitió calcular explícitamente los coeficientes que determinan la amplitud de cada modo de vibración.
+
+\textbf{3. Ecuación de Laplace - Caso General:} Se analizó el problema de Dirichlet en una placa rectangular, donde la condición no homogénea está en el borde superior. La solución involucra funciones hiperbólicas que describen la difusión de la condición de frontera hacia el interior del dominio.
+
+\textbf{4. Ecuación de Laplace - Caso Específico:} Se resolvió un segundo problema de Laplace con configuración de frontera complementaria, donde la condición no homogénea está en el borde inferior. Se destacó la diferencia en la forma de la solución respecto al caso general debido a la ubicación de la condición de frontera no homogénea.
+
+% ============================================================================
+% BIBLIOGRAPHY
+% ============================================================================
+
+\newpage
+\section*{Referencias Bibliográficas}
+\addcontentsline{toc}{section}{Referencias Bibliográficas}
+
+\begin{thebibliography}{99}
+
+\bibitem{strauss}
+Strauss, W. A. (2007). 
+\textit{Partial Differential Equations: An Introduction} (2nd ed.). 
+John Wiley \& Sons.
+
+\bibitem{haberman}
+Haberman, R. (2012). 
+\textit{Applied Partial Differential Equations with Fourier Series and Boundary Value Problems} (5th ed.). 
+Pearson.
+
+\bibitem{evans}
+Evans, L. C. (2010). 
+\textit{Partial Differential Equations} (2nd ed.). 
+American Mathematical Society.
+
+\bibitem{powers}
+Powers, D. L. (2006). 
+\textit{Boundary Value Problems and Partial Differential Equations} (5th ed.). 
+Academic Press.
+
+\bibitem{farlow}
+Farlow, S. J. (1993). 
+\textit{Partial Differential Equations for Scientists and Engineers}. 
+Dover Publications.
+
+\bibitem{asmar}
+Asmar, N. H. (2016). 
+\textit{Partial Differential Equations with Fourier Series and Boundary Value Problems} (3rd ed.). 
+Dover Publications.
+
+\bibitem{pinchover}
+Pinchover, Y., \& Rubinstein, J. (2005). 
+\textit{An Introduction to Partial Differential Equations}. 
+Cambridge University Press.
+
+\bibitem{zill}
+Zill, D. G., \& Wright, W. S. (2014). 
+\textit{Differential Equations with Boundary-Value Problems} (8th ed.). 
+Brooks/Cole, Cengage Learning.
+
+\end{thebibliography}
+
+% ============================================================================
+% DOCUMENT END
+% ============================================================================
+
+\end{document}
