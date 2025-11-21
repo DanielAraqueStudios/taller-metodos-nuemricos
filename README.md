@@ -140,8 +140,8 @@ run ejercicio2_onda.m
 run ejercicio3_laplace.m
 ```
 
-⏱️ **Tiempo estimado:** 3-5 minutos  
-📊 **Resultado:** 19 archivos PNG generados
+⏱️ **Tiempo estimado:** 2-4 minutos  
+📊 **Resultado:** 4 archivos PNG compuestos generados (1 por ejercicio)
 
 ### Paso 2: Compilar Documento LaTeX
 
